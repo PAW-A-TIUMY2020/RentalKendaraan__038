@@ -49,9 +49,9 @@ namespace RentalKendaraan__038.Controllers
         // GET: Peminjamen/Create
         public IActionResult Create()
         {
-            ViewData["IdCustomer"] = new SelectList(_context.Customer, "IdCustomer", "IdCustomer");
-            ViewData["IdJaminan"] = new SelectList(_context.Jaminan, "IdJaminan", "IdJaminan");
-            ViewData["IdKendaraan"] = new SelectList(_context.Kendaraan, "IdKendaraan", "IdKendaraan");
+            ViewData["NamaCustomer"] = new SelectList(_context.Customer, "IdCustomer", "IdCustomer");
+            ViewData["NamaJaminan"] = new SelectList(_context.Jaminan, "IdJaminan", "IdJaminan");
+            ViewData["NamaKendaraan"] = new SelectList(_context.Kendaraan, "IdKendaraan", "IdKendaraan");
             return View();
         }
 
