@@ -19,10 +19,29 @@ namespace RentalKendaraan__038.Controllers
         }
 
         // GET: Kendaraans
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string ktsd, string searchString)
         {
-            var rental_KendaraanssContext = _context.Kendaraan.Include(k => k.IdJenisKendaraanNavigation);
-            return View(await rental_KendaraanssContext.ToListAsync());
+            //buat list menyimpan ketersediaan
+            var ktsdList = new List<string>();
+
+            //query mengambil data
+            var ktsdQuery = from d in _context.Kendaraan orderby d.Ketersediaan select d.Ketersediaan;
+
+            ktsdList.AddRange(ktsdQuery.Distinct());
+
+            //untuk menampilkan di view
+            ViewBag.ktsd = new SelectList(ktsdList);
+
+            //panggil db context
+            var menu = from m in _context.Kendaraan.Include(k => k.IdJenisKendaraanNavigation) select m;
+
+            //untuk memilih dwopdownlist ketersediaan
+            if (!string.IsNullOrEmpty(ktsd))
+            {
+                menu = menu.Where(x => x.Ketersediaan == ktsd);
+            }
+            
+            return View(await menu.ToListAsync());
         }
 
         // GET: Kendaraans/Details/5
