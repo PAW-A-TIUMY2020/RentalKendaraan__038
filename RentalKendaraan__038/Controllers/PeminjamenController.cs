@@ -19,10 +19,35 @@ namespace RentalKendaraan__038.Controllers
         }
 
         // GET: Peminjamen
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string ktsd, string searchString)
         {
-            var rental_KendaraanssContext = _context.Peminjaman.Include(p => p.IdCustomerNavigation).Include(p => p.IdJaminanNavigation).Include(p => p.IdKendaraanNavigation);
-            return View(await rental_KendaraanssContext.ToListAsync());
+            //buat list menyimpan ketersediaan
+            var ktsdList = new List<string>();
+            //Query mengambil data
+            var ktsdQuery = from d in _context.Peminjaman orderby d.IdJaminanNavigation.NamaJaminan.ToString() select d.IdJaminanNavigation.NamaJaminan.ToString();
+
+            ktsdList.AddRange(ktsdQuery.Distinct());
+
+            //untuk menampilkan di view
+            ViewBag.ktsd = new SelectList(ktsdList);
+
+            //panggil db context
+            var menu = from m in _context.Peminjaman.Include(k => k.IdJaminanNavigation) select m;
+
+            //untuk memilih dropdownlist ketersediaan
+            if (!string.IsNullOrEmpty(ktsd))
+            {
+                menu = menu.Where(x => x.IdJaminanNavigation.NamaJaminan.ToString() == ktsd);
+            }
+
+            //untuk search data
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                menu = menu.Where(s => s.IdCustomerNavigation.NamaCustomer.Contains(searchString) || s.IdJaminanNavigation.NamaJaminan.Contains(searchString)
+                || s.IdKendaraanNavigation.NamaKendaraan.Contains(searchString) || s.Biaya.ToString().Contains(searchString) || s.TglPeminjaman.ToString().Contains(searchString));
+            }
+
+            return View(await menu.ToListAsync());
         }
 
         // GET: Peminjamen/Details/5
